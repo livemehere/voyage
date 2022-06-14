@@ -3,7 +3,7 @@ from pymongo import MongoClient
 
 client = MongoClient('mongodb+srv://root:1234@cluster0.yn8vc.mongodb.net/?retryWrites=true&w=majority')
 db = client['kong']
-collection = db['fans']
+collection = db['bucket']
 
 
 app = Flask(__name__)
@@ -12,22 +12,36 @@ app = Flask(__name__)
 def home():
     return render_template('index.html')
 
-@app.route("/homework", methods=["POST"])
-def homework_post():
-    name = request.form['name']
-    comment = request.form['comment']
-    print(name,comment);
+@app.route("/bucket", methods=["POST"])
+def bucket_post():
+    bucket_receive = request.form['bucket_give']
+    buckets = list(collection.find({},{'_id':False}))
 
-    post = { "name": name, "comment": comment }
-    collection.insert_one(post)
+    doc = {
+        'num':len(buckets)+1,
+        'bucket':bucket_receive,
+        'done':0
+    }
 
-    return jsonify({'msg':'팬명록 등록완료!'})
+    collection.insert_one(doc)
 
-@app.route("/homework", methods=["GET"])
-def homework_get():
-    posts = list(collection.find({},{"_id":False}))
-    print(posts)
-    return jsonify({"posts":posts})
+    print(bucket_receive)
+    return jsonify({'msg': '등록 완료!'})
+
+@app.route("/bucket/done", methods=["POST"])
+def bucket_done():
+    num = int(request.form['num'])
+    print(num)
+    collection.update_one({'num':num},{'$set':{'done':'1'}})
+
+    return jsonify({'msg': '완료!'})
+
+@app.route("/bucket", methods=["GET"])
+def bucket_get():
+
+    buckets = list(collection.find({},{'_id':False}))
+
+    return jsonify({'buckets': buckets})
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
