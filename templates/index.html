@@ -89,7 +89,7 @@
                         let temp = `
                             <li>
                                 <h2 class="${b.done && ' done'}">✅ ${b.bucket}</h2>
-                                <button onclick="done_bucket(${b.num})" type="button" class="btn btn-outline-primary">완료!</button>
+                                ${!b.done ? '<button onclick="done_bucket('+b.num+')" type="button" class="btn btn-outline-primary">완료!</button>' : '<button onclick="cancel_bucket('+b.num+')" type="button" class="btn btn-outline-danger">취소</button>'}
                             </li>
                         `;
                         $('#bucket-list').append(temp);
@@ -117,11 +117,22 @@
                 url: "/bucket/done",
                 data: {num},
                 success: function (response) {
-                    alert(response["msg"])
                     window.location.reload()
                 }
             });
         }
+
+        function cancel_bucket(num){
+            $.ajax({
+                type: "POST",
+                url: "/bucket/cancel",
+                data: {num},
+                success: function (response) {
+                    window.location.reload()
+                }
+            });
+        }
+
     </script>
 </head>
 <body>

@@ -32,7 +32,15 @@ def bucket_post():
 def bucket_done():
     num = int(request.form['num'])
     print(num)
-    collection.update_one({'num':num},{'$set':{'done':'1'}})
+    collection.update_one({'num':num},{'$set':{'done':1}})
+
+    return jsonify({'msg': '완료!'})
+
+@app.route("/bucket/cancel", methods=["POST"])
+def bucket_cancel():
+    num = int(request.form['num'])
+    print(num)
+    collection.update_one({'num':num},{'$set':{'done':0}})
 
     return jsonify({'msg': '완료!'})
 
